@@ -332,7 +332,6 @@
 
 
 
-
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
@@ -346,6 +345,8 @@ const Chat = () => {
   const [fileUploaded, setFileUploaded] = useState(false); // Track file upload status
   const [uploadError, setUploadError] = useState('');
   const messagesEndRef = useRef(null);
+  const [activeIndex, setActiveIndex] = useState(null);
+
 
   useEffect(() => {
     scrollToBottom();
@@ -469,9 +470,72 @@ const Chat = () => {
     return numberedList;
   };
 
+  const questions = [
+    {
+      title: 'Approval Recommendation',
+      content:
+        'Do a full detailed summary of the request, business location, the name of the customer, detailing the loan amount/ enhancement, purpose of the loan, collateral description and coverage analysis, repayment capacity.',
+    },
+    {
+      title: 'Group Facility and Exposure Summary',
+      content:
+        'Analyze the group facility and group exposure summary in this Facility Approval Memo (FAM). Identify if there are any discrepancies or issues. Evaluate if the exposures are aligned with the banks risk appetite and provide any concerns or observations.',
+    },
+    {
+      title: 'Security Support and Coverage Analysis',
+      content:
+        'Evaluate the security support structure and security coverage analysis in this FAM. Determine if the proposed securities are appropriate and sufficient to cover the loan amount. Highlight any risks associated with the securities and assess if the FAM properly mitigates these risks. If there are unmitigated risks, identify them and explain their potential impact.',
+    },
+    {
+      title: 'Critical Credit Issues and Risk Mitigation',
+      content:
+        'Review the critical credit issues and risks highlighted in this FAM. Assess if they were properly mitigated and provide a detailed explanation. Identify any additional risks not covered in the FAM that could pose concerns, and suggest measures to address them.',
+    },
+    {
+      title: 'Financial Analysis',
+      content:
+        'Analyze the historical and projected financials of the obligor in this FAM. Provide insights into the obligors capacity to repay the loan based on their financial performance and projections. Highlight any concerns related to repayment ability or financial stability.',
+    },
+    {
+      title: 'Final Recommendation',
+      content:
+        'Based on the analysis of the group facility, security structure, credit issues, and the obligors financials in this FAM, provide a concise recommendation. State whether you would approve or reject this FAM, and explain the reasons for your decision with supporting details.',
+    },
+  ];
+
+  const handleToggle = (index) => {
+    setActiveIndex(index === activeIndex ? null : index); // Toggle the dropdown
+  };
+
+
   return (
     <div className="flex flex-col h-screen bg-gray-100 text-white">
-      <div className="text-black p-2 text-left text-xl">FAMBOT</div>
+      <div className="text-black p-2 text-left text-xl">FamBOT</div>
+
+      <div className="absolute top-10 right-5 flex flex-col text-black z-10 space-y-2">
+      {questions.map((question, index) => (
+        <div key={index} className="flex flex-col space-y-1">
+          <button
+            className="p-2 bg-gray-200 hover:bg-gray-300 rounded-lg text- max-w-[400px] text-left"
+            onClick={() => handleToggle(index)}
+          >
+            {question.title}
+          </button>
+          {activeIndex === index && (
+            <div className="p-2 bg-gray-100 border border-gray-300 rounded-lg max-w-[300px]">
+              <p className="text-sm">{question.content}</p>
+              <button
+                className="mt-2 p-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs"
+                onClick={() => setInput(question.content)}
+              >
+                Select Question
+              </button>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+
 
       <div className="flex flex-col h-full items-center lg:mx-[400px]">
         <div className="flex-grow w-full p-6 overflow-auto custom-scrollbar max-h-[calc(100vh-10rem)]">
@@ -502,18 +566,23 @@ const Chat = () => {
         <div className="flex flex-col w-full items-center justify-center">
           <form onSubmit={handleSubmit} className="py-1 px-2 w-5/6 bg-gray-900 rounded-2xl grid">
             <div className="flex rounded-lg border border-gray-700">
-              <input
+              <textarea
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                className="flex-grow w-full p-2 bg-transparent focus:outline-none"
+                className="flex-grow w-full overflow-hidden p-2 bg-transparent focus:outline-none"
                 placeholder="Type your message..."
-                disabled={isLoading  || !fileUploaded}
+                disabled={isLoading || !fileUploaded}
+                rows = {2}
+                style={{
+                  maxHeight: '100px', // Maximum height of the textarea
+                  lineHeight: '1.5', // Line height for better readability
+                }}
               />
               <button
                 type="submit"
                 className="p-2 bg-green-500 hover:bg-green-600 rounded-r-lg"
-                disabled={isLoading  || !fileUploaded}
+                disabled={isLoading || !fileUploaded}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
