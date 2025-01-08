@@ -460,14 +460,27 @@ const Chat = () => {
     uploadFile();
   };
 
+  // const formatMessageContent = (content) => {
+  //   // Replace "**text**" with bold <strong> tags
+  //   const formattedText = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+  //   // Add line breaks and spacing for numbered lists
+  //   const numberedList = formattedText.replace(/(\d+)\.\s/g, '<br/><br/>$1. ');
+
+  //   return numberedList;
+  // };
+
   const formatMessageContent = (content) => {
     // Replace "**text**" with bold <strong> tags
-    const formattedText = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-    // Add line breaks and spacing for numbered lists
-    const numberedList = formattedText.replace(/(\d+)\.\s/g, '<br/><br/>$1. ');
-
-    return numberedList;
+    let formattedText = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  
+    // Replace "### text" with headings that start on a new line with one line space
+    formattedText = formattedText.replace(/###\s*(.*)/g, '<br/><br/><h3>$1</h3><br/>');
+  
+    // Add line breaks and spacing for numbered lists, but exclude monetary values (e.g., "123.45")
+    formattedText = formattedText.replace(/(\d+)\.(?!\d)/g, '<br/><br/>$1.');
+  
+    return formattedText;
   };
 
   const questions = [
