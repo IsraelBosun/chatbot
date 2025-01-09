@@ -379,7 +379,7 @@ const Chat = () => {
     setIsLoading(true);
     setUploadError('');
     try {
-      const response = await axios.post('https://fambot-backend.onrender.com/upload-pdf', formData, {
+      const response = await axios.post('https://fambot-backend-2.onrender.com/upload-pdf', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
@@ -409,7 +409,7 @@ const Chat = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('https://fambot-backend.onrender.com/ask', { query: input });
+      const response = await axios.post('https://fambot-backend-2.onrender.com/ask', { query: input });
       const answer = response.data.answer;
       const aiMessage = { role: 'ai', content: answer };
       setMessages([...newMessages, aiMessage]);
@@ -470,22 +470,43 @@ const Chat = () => {
   //   return numberedList;
   // };
 
+  // const formatMessageContent = (content) => {
+  //   // Replace "**text**" with bold <strong> tags
+  //   let formattedText = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  
+  //   // Replace "### text" with headings that start on a new line with one line space
+  //   formattedText = formattedText.replace(/###\s*(.*)/g, '<br/><br/><h3>$1</h3><br/>');
+  
+  //   // Add line breaks and spacing for numbered lists, but exclude monetary values (e.g., "123.45")
+  //   formattedText = formattedText.replace(/(\d+)\.(?!\d)/g, '<br/><br/>$1.');
+  
+  //   return formattedText;
+  // };
+
   const formatMessageContent = (content) => {
     // Replace "**text**" with bold <strong> tags
     let formattedText = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   
-    // Replace "### text" with headings that start on a new line with one line space
-    formattedText = formattedText.replace(/###\s*(.*)/g, '<br/><br/><h3>$1</h3><br/>');
+    // Replace "### text" with <h3> tags without extra line breaks
+    formattedText = formattedText.replace(/###\s*(.*)/g, '<h3>$1</h3>');
+  
+    // Replace "## text" with <h2> tags without extra line breaks
+    formattedText = formattedText.replace(/##\s*(.*)/g, '<h2>$1</h2>');
+  
+    // Replace "# text" with <h1> tags without extra line breaks
+    formattedText = formattedText.replace(/#\s*(.*)/g, '<h1>$1</h1>');
   
     // Add line breaks and spacing for numbered lists, but exclude monetary values (e.g., "123.45")
-    formattedText = formattedText.replace(/(\d+)\.(?!\d)/g, '<br/><br/>$1.');
+    formattedText = formattedText.replace(/(\d+)\.(?!\d)/g, '<br/>$1.');
   
     return formattedText;
   };
+  
+  
 
   const questions = [
     {
-      title: 'Approval Recommendation',
+      title: 'FAM Details',
       content:
         'Do a full detailed summary of the request, business location, the name of the customer, detailing the loan amount/ enhancement, purpose of the loan, collateral description and coverage analysis, repayment capacity.',
     },
@@ -507,13 +528,19 @@ const Chat = () => {
     {
       title: 'Financial Analysis',
       content:
-        'Analyze the historical and projected financials of the obligor in this FAM. Provide insights into the obligors capacity to repay the loan based on their financial performance and projections. Highlight any concerns related to repayment ability or financial stability.',
+        'Analyze the historical and projected financials of the obligor in this FAM, including detailed figures and trends of the sales and profitability, liquidity and leverage, cashflow, asset management  Provide insights into the obligors capacity to repay the loan based on their financial performance and projections. Highlight any trends, concerns related to repayment ability, or issues impacting financial stability.',
     },
     {
-      title: 'Final Recommendation',
+      title: 'Recommendation 1',
       content:
-        'Based on the analysis of the group facility, security structure, credit issues, and the obligors financials in this FAM, provide a concise recommendation. State whether you would approve or reject this FAM, and explain the reasons for your decision with supporting details.',
+        'Give a review of the fam based on the following Borrower Profile: Clearly state the borrower’s line of business (e.g., merchandise dealer, FMCG wholesale), specify the location of operations and primary market coverage, and list key suppliers or partners to establish credibility and supply chain stability. 2. Loan Request Details: Indicate the type of facility (e.g., renewal, enhancement, or new facility like Overdraft or Term Loan), specify the requested enhancement or renewal amount, and highlight the rationale for the request (e.g., increased working capital due to rising costs). 3. Banking Relationship: Provide details on account activity, including total turnover across all banks, wallet share percentage controlled by the institution, and monthly collection consistency with average amounts. Include information on existing obligations, such as active loans or overdrafts with other financial institutions and their repayment status, along with evidence of resolution for classified accounts. Ensure updated and clean credit reports on any flagged accounts or facilities. 4. Financial Performance: Confirm turnover and profitability using audited financial statements (AFS) to validate a growing and profitable business, and highlight minimal liabilities relative to turnover and profitability. 5. Security/Collateral: Specify the proposed collateral (e.g., Tripartite Legal Mortgage) and its valuation, including Fair Sale Value (FSV) and its coverage relative to the facility amount, ensuring that the net coverage ratio meets acceptable thresholds (e.g., 120%). 6. Loan Terms: Clearly state the approved facility amount, specify the required monthly collection-to-exposure ratio (CER) (e.g., 150%), and include details of the tenor and cleanup requirements (e.g., 90 days). 7. Conditions Precedent: For pre-disbursement, ensure updated credit checks on flagged positions, evidence of repayment or clearance of classified amounts, and execution of all security documentation. For post-disbursement, maintain agreed CER and account activity levels. 8. Justification for Approval: Highlight evidence of the borrower’s capacity to efficiently utilize the facility, note their demonstrated stability and repayment history, and address identified risks with proper mitigants (e.g., stable inflow trends, collateral coverage).',
     },
+    {
+      title: 'Recommendation 2',
+      content:
+        'Review the following Facility Approval Memo (FAM) from a critical credit analysts perspective. Identify any lapses or issues in the content, such as inablility of the obligor to repay based on his financials,  incomplete information, unmitigated risks,  inconsistencies, or areas of concern that may affect creditworthiness. Then, draft a response to the Credit Risk Manager, providing a clear approval or rejection decision along with justifications for the choice based on the identified issues or strengths in the FAM.',
+    },
+    
   ];
 
   const handleToggle = (index) => {
@@ -536,7 +563,11 @@ const Chat = () => {
           </button>
           {activeIndex === index && (
             <div className="p-2 bg-gray-100 border border-gray-300 rounded-lg max-w-[300px]">
-              <p className="text-sm">{question.content}</p>
+              <p
+                className={`text-sm ${question.content.split(' ').length > 100 ? 'h-20 overflow-y-auto' : ''}`}
+              >
+                {question.content}
+              </p>
               <button
                 className="mt-2 p-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs"
                 onClick={() => setInput(question.content)}
